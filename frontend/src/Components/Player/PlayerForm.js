@@ -4,10 +4,8 @@ import axios from "axios";
 class PlayerForm extends React.Component {
   constructor(props) {
     super(props);
-    const player = props.player;
-    console.log(props.player, "constructor");
 
-    this.refs = React.createRef();
+    const player = props.getPlayers;
 
     this.state = {
       data: {
@@ -20,9 +18,7 @@ class PlayerForm extends React.Component {
     };
   }
   componentWillReceiveProps() {
-    // console.log("recived", this.props.getPlayerById())
     const values = this.props.player;
-    console.log("values", values);
 
     this.setState(
       {
@@ -34,25 +30,19 @@ class PlayerForm extends React.Component {
           email: values.email,
         },
       },
-      console.log("f", this.state.firstname)
     );
   }
 
-  // componentDidMount(){
-  //   console.log(this.state,"did mount")
-  // }
-
   submitPlayer(event) {
-    debugger;
+    
     event.preventDefault();
-    console.log(this.state.data, "submitted");
+
     const { data } = this.state;
     // const { data } = await axios.get(url + "/" + id);
     let url =
-      data.id != undefined
-        ? "http://localhost:8080/playerUpdate/" + data.id
-        : "http://localhost:8080/player";
-    data.id != undefined
+      data.id !== undefined ? "http://localhost:8080/playerUpdate/" + data.id : "http://localhost:8080/player";
+
+    data.id !== undefined
       ? axios
           .put(url, {
             firstname: data.firstname,
@@ -62,7 +52,7 @@ class PlayerForm extends React.Component {
           })
           .then((response) => {
             console.log(response);
-            this.props.getPlayers();
+            this.props.refreshPlayer();
           })
           .catch((error) => {
             console.log(error);
@@ -76,7 +66,7 @@ class PlayerForm extends React.Component {
           })
           .then((response) => {
             console.log(response);
-            this.props.getPlayers();
+            this.props.refreshPlayer();
           })
           .catch((error) => {
             console.log(error);
@@ -93,36 +83,37 @@ class PlayerForm extends React.Component {
   };
 
   updatePlayer(id) {
-    console.log("daddd", id);
-    const data = this.state;
+    
+    console.log("Update player ID: ", id);
+    const {data} = this.state;
     axios
-      .post("http://localhost:8080/player", {
+      .put("http://localhost:8080/playerUpdate/"+id, {
         firstname: data.firstname,
         lastname: data.lastname,
         phone: data.phone,
         email: data.email,
       })
       .then((response) => {
-        console.log(response);
-        this.props.getPlayers();
+        console.log("update response: ",response);
+        // this.props.getPlayers();
       })
       .catch((error) => {
         console.log(error);
       });
   }
 
+
   render() {
     const { data } = this.state;
     return (
       <div className="row">
         <h1 className="center">Add a new Player </h1>
-        <form className="col s12" onSubmit={this.submitPlayer.bind(this)}>
+        <form className="col s12">
           <div className="row">
             <div className="input-field col s6">
               <input
                 id="firstname"
                 type="text"
-                ref="firstname"
                 onChange={this.changeField}
                 value={data.firstname}
               />
@@ -131,7 +122,6 @@ class PlayerForm extends React.Component {
             <div className="input-field col s6">
               <input
                 id="lastname"
-                ref="lastname"
                 type="text"
                 onChange={this.changeField}
                 value={data.lastname}
@@ -143,7 +133,6 @@ class PlayerForm extends React.Component {
             <div className="input-field col s6">
               <input
                 id="phone"
-                ref="phone"
                 type="text"
                 onChange={this.changeField}
                 value={data.phone}
@@ -153,7 +142,6 @@ class PlayerForm extends React.Component {
             <div className="input-field col s6">
               <input
                 id="email"
-                ref="email"
                 type="text"
                 onChange={this.changeField}
                 value={data.email}
@@ -162,19 +150,20 @@ class PlayerForm extends React.Component {
             </div>
           </div>
 
-          {data.firstname == undefined ? (
+          {data.id === undefined ? (
             <button
               className="btn waves-effect waves-light"
-              type="submit"
               name="action"
+              onClick={(event) => this.submitPlayer(event)}
             >
               Add Player
             </button>
           ) : (
             <button
               className="btn waves-effect waves-light"
-              type="submit"
+              type="button"
               name="action"
+              onClick={() => this.updatePlayer(data.id)}
             >
               Update
             </button>

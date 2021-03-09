@@ -17,6 +17,8 @@ class App extends React.Component {
       player: {},
     };
     this.UpdateCurrentPlayer = this.UpdateCurrentPlayer.bind(this);
+    this.deletePlayer = this.deletePlayer.bind(this);
+    this.getPlayerById = this.getPlayerById.bind(this);
   }
 
   getPlayers = () => {
@@ -31,6 +33,25 @@ class App extends React.Component {
         console.log(error);
       });
   };
+
+  deletePlayer(id) {
+    axios
+      .delete(url + "/" + id)
+      .then((Response) => {
+        alert("The record has been deleted");
+      })
+      .then(() => {
+        debugger;
+        this.setState({
+          Players: this.state.Players.filter((x) => x._id !== id),
+        });
+        
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
   componentDidMount() {
     this.getPlayers();
   }
@@ -41,13 +62,16 @@ class App extends React.Component {
     });
   }
 
-  getPlayerById = async (id) => {
-    console.log(id, "id");
+  getPlayerById =  (id) => {
+
     try {
-      const { data } = await axios.get(url + "/" + id);
-      console.log(data);
-      this.setState({ player: data });
-      // return data;
+      axios.get (url + "/" + id)
+      .then(async(Response) => {
+       await this.setState({ 
+          player: Response.data
+        });
+      })
+
     } catch (ex) {
       console.log(ex);
     }
@@ -61,7 +85,8 @@ class App extends React.Component {
     //   .catch((error) => {
     //     console.log(error);
     //   });
-  };
+  }
+
 
   render() {
     return (
@@ -81,6 +106,7 @@ class App extends React.Component {
               players={this.state.Players}
               UpdateCurrentPlayer={this.UpdateCurrentPlayer}
               getPlayerById={this.getPlayerById}
+              deletePlayer={this.deletePlayer}
             />
           </div>
           <div className="col s9">
@@ -91,7 +117,8 @@ class App extends React.Component {
           <div className="col s12">
             {/* {this.state.player.firstname && <PlayerForm getPlayers={this.getPlayers} player={this.state.player}/>} */}
             <PlayerForm
-              getPlayers={this.getPlayers}
+              getPlayers={this.state.Players}
+              refreshPlayer={this.getPlayers}
               player={this.state.player}
             />
           </div>

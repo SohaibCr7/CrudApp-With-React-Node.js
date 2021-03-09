@@ -1,5 +1,6 @@
 import React from "react";
 import Player from "./Player";
+
 const PlayerList = (props) => {
   return (
     <div>
@@ -8,7 +9,13 @@ const PlayerList = (props) => {
           <h4>player</h4>
         </li>
         {props.players.map((item) => (
-          <Player key={item._id} getPlayerById={props.getPlayerById} playerData={item} updatePlayer={props.UpdateCurrentPlayer} ></Player>
+          <Player
+            key={item._id}
+            getPlayerById={props.getPlayerById}
+            playerData={item}
+            updatePlayer={props.UpdateCurrentPlayer}
+            deletePlayer={props.deletePlayer}
+          ></Player>
         ))}
       </ul>
     </div>
