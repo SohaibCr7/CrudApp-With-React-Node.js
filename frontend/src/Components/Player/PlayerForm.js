@@ -5,44 +5,41 @@ class PlayerForm extends React.Component {
   constructor(props) {
     super(props);
 
-    const player = props.getPlayers;
-
     this.state = {
       data: {
         id: "",
-        firstname: player.firstname,
-        lastname: player.lastname,
-        phone: player.phone,
-        email: player.email,
+        firstname: "",
+        lastname: "",
+        phone: "",
+        email: "",
       },
     };
   }
-  componentWillReceiveProps() {
-    const values = this.props.player;
-
-    this.setState(
-      {
+  componentWillReceiveProps(nextProps) {
+    const { player } = nextProps;
+    if (player._id)
+      this.setState({
         data: {
-          id: values._id,
-          firstname: values.firstname,
-          lastname: values.lastname,
-          phone: values.phone,
-          email: values.email,
+          id: player._id,
+          firstname: player.firstname,
+          lastname: player.lastname,
+          phone: player.phone,
+          email: player.email,
         },
-      },
-    );
+      });
   }
 
   submitPlayer(event) {
-    
     event.preventDefault();
 
     const { data } = this.state;
     // const { data } = await axios.get(url + "/" + id);
     let url =
-      data.id !== undefined ? "http://localhost:8080/playerUpdate/" + data.id : "http://localhost:8080/player";
+      data.id !== ""
+        ? "http://localhost:8080/playerUpdate/" + data.id
+        : "http://localhost:8080/player";
 
-    data.id !== undefined
+    data.id !== ""
       ? axios
           .put(url, {
             firstname: data.firstname,
@@ -74,34 +71,30 @@ class PlayerForm extends React.Component {
   }
 
   changeField = (event) => {
-    console.log(event.target.id, event.target.value, "eventttt");
     const { data } = this.state;
-    console.log(data, "before");
+
     data[event.target.id] = event.target.value;
-    console.log(data, "after");
-    this.setState({ ...data });
+
+    this.setState({ data });
   };
 
   updatePlayer(id) {
-    
-    console.log("Update player ID: ", id);
-    const {data} = this.state;
+    const { data } = this.state;
     axios
-      .put("http://localhost:8080/playerUpdate/"+id, {
+      .put("http://localhost:8080/playerUpdate/" + id, {
         firstname: data.firstname,
         lastname: data.lastname,
         phone: data.phone,
         email: data.email,
       })
       .then((response) => {
-        console.log("update response: ",response);
+        console.log("update response: ", response);
         // this.props.getPlayers();
       })
       .catch((error) => {
         console.log(error);
       });
   }
-
 
   render() {
     const { data } = this.state;
@@ -150,7 +143,7 @@ class PlayerForm extends React.Component {
             </div>
           </div>
 
-          {data.id === undefined ? (
+          {data.id === "" ? (
             <button
               className="btn waves-effect waves-light"
               name="action"
